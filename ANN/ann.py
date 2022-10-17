@@ -24,7 +24,6 @@ class ANN:
         self.loss_function = loss_function
         self.initialize_weights()
 
-
     def initialize_weights(self):   # TODO
         self.input_hidden_w=np.random.normal(loc=0.0,scale=1.0,szie=(self.num_hidden_units,self.num_input_features))
         self.hidden_output_w=np.random.normal(loc=0.0,scale=1.0,size=(self.num_outputs,self.num_hidden_units))
@@ -55,45 +54,43 @@ class ANN:
         self.d_input_output=np.dot((self.hidden_loss*CrossEntropyLoss.grad()),self.input.T)              
         
 
-    def update_params(self):    # TODO
-        self.hidden_output_w+=self.d_hidden_output
-        self.input_hidden_w+=self.d_input_output
+    def update_params(self, learning_rate=0.01):    # TODO
+        self.hidden_output_w+=self.d_hidden_output * learning_rate
+        self.input_hidden_w+=self.d_input_output * learning_rate
         # Take the optimization step.
 
 
     def train(self, dataset_x, dataset_y, learning_rate=0.01, num_epochs=100):
         for epoch in range(num_epochs):
-            y=self.forward(dataset_x)
-            loss=CrossEntropyLoss(dataset_y,y)
+            y_pred=self.forward(dataset_x)
+            loss=CrossEntropyLoss(dataset_y,y_pred)
             self.backward(loss)
-            self.update_params()
+            self.update_params(learning_rate)
 
 
-    def test(self, test_dataset):
+    def test(self, test_x,test_labels):
         accuracy = 0    # Test accuracy
-        y_pred=self.forward(test_dataset)
-        y_target=dataset_y
-        accuracy = accuracy_score(y_target, y_pred)
+        y_pred=self.forward(test_x)
+        accuracy = accuracy_score(test_labels, y_pred)
         # Get predictions from test dataset
         # Calculate the prediction accuracy, see utils.py
         return accuracy
 
 
 def main(argv):
-    ann = ANN(num_input_features=input_list,num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation(), output_activation=SoftmaxActivation(), loss_function=CrossEntropyLoss())
+    ann = ANN(num_input_features=64,num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation, output_activation=SoftmaxActivation, loss_function=CrossEntropyLoss)
     # Load dataset
-    dataset_x, dataset_y = readDataLabels()      # dataset[0] = X, dataset[1] = y
-    train_x, train_y = train_test_split(dataset_x,dataset_y)
+    X,y = readDataLabels()      # dataset[0] = X, dataset[1] = y
     # Split data into train and test split. call function in data.py
+    train_x,train_labels, test_y,test_labels = train_test_split(X,y)
     # call ann->train()... Once trained, try to store the model to avoid re-training everytime
     if mode == 'train':
-        ann.train(train_x, train_y)       # Call ann training code here
+        ann.train(train_x, train_labels)       # Call ann training code here
     else:
         # Call loading of trained model here, if using this mode (Not required, provided for convenience)
         raise NotImplementedError
-
+    ann.test(test_y,test_labels)
     # Call ann->test().. to get accuracy in test set and print it.
-
 
 if __name__ == "__main__":
     main(sys.argv)
