@@ -36,41 +36,55 @@ class CrossEntropyLoss:     # TODO: Make this work!!!
         self.current_gt = None
         pass
 
-    def __call__(self, y_pred, y_gt):
+#y_gt = np.random.randint(2, size=10)
+#y_pred = np.random.uniform(0, 1, size=10)
+    def __call__(self, y_pred, y_gt): # y_pred should be an array of probabilities
         # TODO: Calculate Loss Function
-        loss = None
+        self.current_prediction = y_pred
+        self.current_gt = y_gt
+        loss = y_gt*np.log(y_pred) + (1-y_gt)*np.log(1-y_pred)
         return loss
 
     def grad(self):
         # TODO: Calculate Gradients for back propagation
-        gradient = None
+        gradient = self.current_gt/self.current_prediction - (1-self.current_gt)/(1-self.current_prediction)
+
+        self.current_prediction = None
+        self.current_gt = None
         return gradient
 
 
 class SoftmaxActivation:    # TODO: Make this work!!!
     def __init__(self):
+        self.z = None
         pass
-
-    def __call__(self, y):
+    def __call__(self, z):
         # TODO: Calculate Activation Function
-        pass
-
+        self.z = z
+        exps = np.exp(z)
+        y = exps / np.sum(exps)
+        return y
     def __grad__(self):
         # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        pass
+        s = y.reshape(-1,1)
+        gradient = np.diagflat(s) - np.dot(s, s.T)
+        return gradient
 
 
 class SigmoidActivation:    # TODO: Make this work!!!
     def __init__(self):
+        self.z = None
         pass
 
-    def __call__(self, y):
+    def __call__(self, z):
         # TODO: Calculate Activation Function
-        pass
+        sigmoid = 1/(1+np.exp(-z))
+        return y
 
     def __grad__(self):
         # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        pass
+        gradient = y*(1-y)
+        return gradient
 
 
 class ReLUActivation:
