@@ -27,8 +27,13 @@ def readDataLabels():
 
 def to_categorical(y):
 	#Convert the nominal y values to categorical
-
-	return y
+	result = []
+	for label in y:
+		assert label < 10;
+		one_hot = np.zeros(10)
+		one_hot[label] = 1
+		result.append(one_hot)
+	return np.array(result)
 	
 def train_test_split(X,y,n=0.8):
 	# Instructions: split data in training and testing sets.
