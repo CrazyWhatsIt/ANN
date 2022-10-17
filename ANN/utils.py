@@ -69,6 +69,16 @@ class SoftmaxActivation:    # TODO: Make this work!!!
         s = y.reshape(-1,1)
         gradient = np.diagflat(s) - np.dot(s, s.T)
         return gradient
+#    def __grad__(self):
+#        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
+#        jacobian = np.diag(y)
+#        for i in range(len(jacobian)):
+#            for j in range(len(jacobian)):
+#                if i==j:
+#                    jacobian[i][j] = y[i]*(1-y[i])
+#                else:
+#                    jacobian[i][j] = -y[i]*y[j]
+#        return jacobian
 
 
 class SigmoidActivation:    # TODO: Make this work!!!
