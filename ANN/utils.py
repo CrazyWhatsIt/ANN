@@ -42,12 +42,14 @@ class CrossEntropyLoss:     # TODO: Make this work!!!
         # TODO: Calculate Loss Function
         self.current_prediction = y_pred
         self.current_gt = y_gt
-        loss = y_gt*np.log(y_pred) + (1-y_gt)*np.log(1-y_pred)
+        log_prob = np.log(y_pred)
+        loss = -np.sum(y_gt*y_pred)
         return loss
 
     def grad(self):
         # TODO: Calculate Gradients for back propagation
-        gradient = self.current_gt/self.current_prediction - (1-self.current_gt)/(1-self.current_prediction)
+        # Derived by calculating dL/dy_pred
+        gradient = -np.sum(self.current_gt/self.current_prediction)
 
         self.current_prediction = None
         self.current_gt = None
@@ -61,16 +63,14 @@ class SoftmaxActivation:    # TODO: Make this work!!!
     def __call__(self, z):
         # TODO: Calculate Activation Function
         self.z = z
-        exps = np.exp(z)
-        y = exps / np.sum(exps)
+        y = np.exp(z) / np.sum(np.exp(z))
+        self.y = y
         return y
     def __grad__(self):
         # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        s = y.reshape(-1,1)
-        gradient = np.diagflat(s) - np.dot(s, s.T)
+        gradient = self.y*(1-self.y)
         return gradient
 #    def __grad__(self):
-#        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
 #        jacobian = np.diag(y)
 #        for i in range(len(jacobian)):
 #            for j in range(len(jacobian)):
@@ -79,6 +79,10 @@ class SoftmaxActivation:    # TODO: Make this work!!!
 #                else:
 #                    jacobian[i][j] = -y[i]*y[j]
 #        return jacobian
+#    def __grad__(self):
+#        s = self.y.reshape(-1,1)
+#        gradient = np.diagflat(s) - np.dot(s, s.T)
+#        return gradient
 
 
 class SigmoidActivation:    # TODO: Make this work!!!
@@ -88,12 +92,13 @@ class SigmoidActivation:    # TODO: Make this work!!!
 
     def __call__(self, z):
         # TODO: Calculate Activation Function
-        sigmoid = 1/(1+np.exp(-z))
+        y = 1/(1+np.exp(-z))
+        self.y = y
         return y
 
     def __grad__(self):
         # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        gradient = y*(1-y)
+        gradient = self.y*(1-self.y)
         return gradient
 
 
