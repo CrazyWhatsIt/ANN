@@ -52,20 +52,20 @@ class ANN:
         # Trick here is not to think in terms of one neuron at a time
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
-
         # here we calculate the inner product for the input layer.
-        input_layer_inner_product = np.dot(self.weight1, input_array.T) + self.bias1.T
+        input_layer_inner_product = np.dot(self.weight1, input_array.T).T + self.bias1
         # next we should apply the sigmoid function to the input inner product.
         sigmoid_output = self.hidden_unit_activation(input_layer_inner_product)
         # next, take the output of the sigmoid function and apply the inner product for the hidden layer.
-        hidden_layer_inner_product = np.dot(self.weight2, sigmoid_output.T) + self.bias2.T
+        hidden_layer_inner_product = np.dot(self.weight2, sigmoid_output.T).T + self.bias2
         # apply the softmax activation function to the output of the hidden layer activation function.
         self.predicted_values = self.output_activation(hidden_layer_inner_product)
         return self.predicted_values
 
-    def backward(self, y_gt):  # TODO
-        CEL = CrossEntropyLoss()
-        CEL(self.y_pred, y_gt)
+    def backward(self, labels):
+        # start by calculating the error with the loss function.
+        error = self.loss_function(self.predicted_values, labels)
+        
         dL_dy_pred = CEL.grad()
 
         SMA = SoftmaxActivation()
@@ -88,6 +88,7 @@ class ANN:
         self.dL_db1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_db1
 
     def update_params(self, learning_rate=0.01):  # TODO
+        raise NotImplementedError;
         # Take the optimization step.
         self.w1 = self.w1 - learning_rate * self.dL_dw1
         self.w2 = self.w2 - learning_rate * self.dL_dw2
@@ -95,6 +96,7 @@ class ANN:
         self.b2 = self.b2 - learning_rate * self.dL_db2
 
     def train(self, data, labels, learning_rate=0.01, num_epochs=100):
+        raise NotImplementedError;
         self.initialize_weights()
         for epoch in range(num_epochs):
             print('epoch ', epoch)
@@ -103,12 +105,13 @@ class ANN:
             self.update_params()
 
     def test(self, test_x, test_labels):
+        raise NotImplementedError;
         accuracy = 0  # Test accuracy
         y_pred = self.forward(test_x)
         accuracy = accuracy_score(test_labels, y_pred)
         # Get predictions from test dataset
         # Calculate the prediction accuracy, see utils.py
-        accuracy = accuracy_score(y_gt, self.y_pred)
+        accuracy = accuracy_score(test_labels, self.y_pred)
         return accuracy
 
 
@@ -116,8 +119,8 @@ def main(argv):
     debug = True
     if debug: print("!! Start the artificial neural network !!")
     if debug: print("Construct the ANN Object.")
-    ann = ANN(num_input_features=64, num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation,
-              output_activation=SoftmaxActivation, loss_function=CrossEntropyLoss)
+    ann = ANN(num_input_features=64, num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation(),
+              output_activation=SoftmaxActivation(), loss_function=CrossEntropyLoss())
     if debug: print("Load the dataset.")
     X,y = readDataLabels()
     # Split data into train and test split. call function in data.py
