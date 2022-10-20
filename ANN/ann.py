@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 from data import readDataLabels, normalize_data, train_test_split, to_categorical
-from utils import accuracy_score, CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
+from utils import CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
 
 # Create an MLP with 8 neurons
 # Input -> Hidden Layer -> Output Layer -> Output
@@ -24,50 +24,44 @@ class ANN:
         self.output_activation = output_activation
         self.loss_function = loss_function
         # weights
-        self.input_hidden_w = None
-        self.hidden_output_w = None
-        self.w1 = None
-        self.b1 = None
-        self.w2 = None
-        self.b2 = None
+        self.weight1 = None
+        self.bias1 = None
+        self.weight2 = None
+        self.bias2 = None
         self.initialize_weights()
         # data
-        self.x = None # the input array
-        self.y_pred = None
-        self.z2 = None
-        self.z1 = None
-        self.z = None
+        self.training_data = None # do we need to remember the training data? should just need to remember the model.
+        self.predicted_values = None # do we need to remember the predicted values on a single run?
 
 
     def initialize_weights(self):
-        self.input_hidden_w = np.random.normal(loc=0.0, scale=1.0,
-                                               size=(self.num_hidden_units, self.num_input_features))
-        self.hidden_output_w = np.random.normal(loc=0.0, scale=1.0, size=(self.num_outputs, self.num_hidden_units))
         # Create and Initialize the weight matrices
         # Never initialize to all zeros. Not Cool!!!
         # Try something like uniform distribution. Do minimal research and use a cool initialization scheme.
-        self.w1 = np.random.uniform(0, 1, size=(
-            self.num_hidden_units, self.num_input_features))  # input_w is of shape 16 by 64.
-        self.b1 = np.random.uniform(0, 1, size=self.num_hidden_units)  # input_b is of shape 1 by 16.
-        self.w2 = np.random.uniform(0, 1,
-                                    size=(self.num_outputs, self.num_hidden_units))  # hidden_w is of shape 10 by 16.
-        self.b2 = np.random.uniform(0, 1, size=self.num_outputs)  # hidden_b is of shape 1 by 10.
+        self.weight1 = np.random.uniform(0, 1, size=( self.num_hidden_units, self.num_input_features))
+        self.bias1 = np.random.uniform(0, 1, size=self.num_hidden_units)
+        self.weight2 = np.random.uniform(0, 1, size=(self.num_outputs, self.num_hidden_units))
+        self.bias2 = np.random.uniform(0, 1, size=self.num_outputs)
 
-    def forward(self, input_array):  # TODO
+    def forward(self, input_array):
         # x = input matrix
+        # the inner product is z = w.x + b where w are the weights and b is the bias.
+
         # hidden activation y = f(z), where z = w.x + b
         # output = g(z'), where z' =  w'.y + b'
         # Trick here is not to think in terms of one neuron at a time
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
 
-        self.x = input_array  # x is of shape 1 by 64, or N by 64 for a sample of size N.
-        self.z = np.dot(self.w1, self.x.T) + self.b1.T
-        HUA = self.hidden_unit_activation()
-        self.z1 = HUA(self.z)
-        self.z2 = np.dot(self.w2, self.z1.T) + self.b2.T
-        OA = self.output_activation()
-        self.y_pred = OA(self.z2)
+        # here we calculate the inner product for the input layer.
+        input_layer_inner_product = np.dot(self.weight1, input_array.T) + self.bias1.T
+        # next we should apply the sigmoid function to the input inner product.
+        sigmoid_output = self.hidden_unit_activation(input_layer_inner_product)
+        # next, take the output of the sigmoid function and apply the inner product for the hidden layer.
+        hidden_layer_inner_product = np.dot(self.weight2, sigmoid_output.T) + self.bias2.T
+        # apply the softmax activation function to the output of the hidden layer activation function.
+        self.predicted_values = self.output_activation(hidden_layer_inner_product)
+        return self.predicted_values
 
     def backward(self, y_gt):  # TODO
         CEL = CrossEntropyLoss()
@@ -100,12 +94,12 @@ class ANN:
         self.b1 = self.b1 - learning_rate * self.dL_db1
         self.b2 = self.b2 - learning_rate * self.dL_db2
 
-    def train(self, x, y_gt, learning_rate=0.01, num_epochs=100):
+    def train(self, data, labels, learning_rate=0.01, num_epochs=100):
         self.initialize_weights()
         for epoch in range(num_epochs):
             print('epoch ', epoch)
-            self.forward(input_array=x)  # self.forward records all intermediate variables in forward propagation.
-            self.backward(y_gt)
+            self.forward(input_array=data)  # self.forward records all intermediate variables in forward propagation.
+            self.backward(labels)
             self.update_params()
 
     def test(self, test_x, test_labels):
@@ -137,7 +131,7 @@ def main(argv):
     test_y = to_categorical(test_y)
     # call ann->train()... Once trained, try to store the model to avoid re-training everytime
     if mode == 'train':
-        ann.train(x=train_x, y_gt=train_y)        # Call ann training code here
+        ann.train(data=train_x, labels=train_y)        # Call ann training code here
     else:
         # Call loading of trained model here, if using this mode (Not required, provided for convenience)
         raise NotImplementedError
