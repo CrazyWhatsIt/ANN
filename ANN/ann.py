@@ -38,9 +38,9 @@ class ANN:
         # Create and Initialize the weight matrices
         # Never initialize to all zeros. Not Cool!!!
         # Try something like uniform distribution. Do minimal research and use a cool initialization scheme.
-        self.weight1 = np.random.uniform(0, 1, size=( self.num_hidden_units, self.num_input_features))
+        self.weight1 = np.random.uniform(0, 1, size=(self.num_input_features, self.num_hidden_units))
         self.bias1 = np.random.uniform(0, 1, size=self.num_hidden_units)
-        self.weight2 = np.random.uniform(0, 1, size=(self.num_outputs, self.num_hidden_units))
+        self.weight2 = np.random.uniform(0, 1, size=(self.num_hidden_units, self.num_outputs))
         self.bias2 = np.random.uniform(0, 1, size=self.num_outputs)
 
     def forward(self, input_array):
@@ -53,11 +53,11 @@ class ANN:
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
         # here we calculate the inner product for the input layer.
-        input_layer_inner_product = np.dot(self.weight1, input_array.T).T + self.bias1
+        input_layer_inner_product = np.dot(input_array, self.weight1) + self.bias1
         # next we should apply the sigmoid function to the input inner product.
         sigmoid_output = self.hidden_unit_activation(input_layer_inner_product)
         # next, take the output of the sigmoid function and apply the inner product for the hidden layer.
-        hidden_layer_inner_product = np.dot(self.weight2, sigmoid_output.T).T + self.bias2
+        hidden_layer_inner_product = np.dot(sigmoid_output, self.weight2) + self.bias2
         # apply the softmax activation function to the output of the hidden layer activation function.
         self.predicted_values = self.output_activation(hidden_layer_inner_product)
         return self.predicted_values
@@ -65,30 +65,30 @@ class ANN:
     def backward(self, labels):
         # start by calculating the error with the loss function.
         error = self.loss_function(self.predicted_values, labels)
-        
-        dL_dy_pred = CEL.grad()
-
-        SMA = SoftmaxActivation()
-        SMA(self.z2)
-        dy_pred_dz2 = SMA.__grad__()
-
-        dz2_dz1 = self.w2
-        dz2_dw2 = self.z1
-
-        SigA = SigmoidActivation()
-        SigA(self.z)
-        dz1_dz = SigA.__grad__()
-        dz_dw1 = self.x
-        self.dL_dw2 = dL_dy_pred * dy_pred_dz2 * dz2_dw2
-        self.dL_dw1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_dw1
-
-        dz2_db2 = 1
-        self.dL_db2 = dL_dy_pred * dy_pred_dz2 * dz2_db2
-        dz_db1 = 1
-        self.dL_db1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_db1
+        print(np.shape(error))
+        # dL_dy_pred = CEL.grad()
+        #
+        # SMA = SoftmaxActivation()
+        # SMA(self.z2)
+        # dy_pred_dz2 = SMA.__grad__()
+        #
+        # dz2_dz1 = self.w2
+        # dz2_dw2 = self.z1
+        #
+        # SigA = SigmoidActivation()
+        # SigA(self.z)
+        # dz1_dz = SigA.__grad__()
+        # dz_dw1 = self.x
+        # self.dL_dw2 = dL_dy_pred * dy_pred_dz2 * dz2_dw2
+        # self.dL_dw1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_dw1
+        #
+        # dz2_db2 = 1
+        # self.dL_db2 = dL_dy_pred * dy_pred_dz2 * dz2_db2
+        # dz_db1 = 1
+        # self.dL_db1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_db1
 
     def update_params(self, learning_rate=0.01):  # TODO
-        raise NotImplementedError;
+        raise NotImplementedError
         # Take the optimization step.
         self.w1 = self.w1 - learning_rate * self.dL_dw1
         self.w2 = self.w2 - learning_rate * self.dL_dw2
@@ -96,16 +96,15 @@ class ANN:
         self.b2 = self.b2 - learning_rate * self.dL_db2
 
     def train(self, data, labels, learning_rate=0.01, num_epochs=100):
-        raise NotImplementedError;
         self.initialize_weights()
         for epoch in range(num_epochs):
             print('epoch ', epoch)
             self.forward(input_array=data)  # self.forward records all intermediate variables in forward propagation.
-            self.backward(labels)
-            self.update_params()
+            #self.backward(labels)
+            #self.update_params()
 
     def test(self, test_x, test_labels):
-        raise NotImplementedError;
+        raise NotImplementedError
         accuracy = 0  # Test accuracy
         y_pred = self.forward(test_x)
         accuracy = accuracy_score(test_labels, y_pred)
@@ -139,7 +138,7 @@ def main(argv):
         # Call loading of trained model here, if using this mode (Not required, provided for convenience)
         raise NotImplementedError
     # Call ann->test().. to get accuracy in test set and print it.
-    ann.test(test_x, test_y)
+    # ann.test(test_x, test_y)
 #
 # if __name__ == "__main__":
 #    main(sys.argv)
