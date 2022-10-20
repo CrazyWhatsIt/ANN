@@ -92,6 +92,7 @@ class SigmoidActivation:    # TODO: Make this work!!!
 
     def __call__(self, z):
         # TODO: Calculate Activation Function
+        self.z = z
         y = 1/(1+np.exp(-z))
         self.y = y
         return y
