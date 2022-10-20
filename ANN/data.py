@@ -36,35 +36,31 @@ def to_categorical(y):
 	return np.array(result)
 	
 def train_test_split(X,y,n=0.8):
-	# Instructions: split data in training and testing sets.
-	assert len(X) == len(y)
-	assert n < 1
-	assert n > 0
-	training_data = []
-	testing_data = []
-	training_labels = []
-	testing_labels = []
-	for index in range(0, len(X)):
-		# note that the seed can be set with random.seed().
-		# useful for debugging.
-		roll = random.uniform(0, 1)
-		if roll < n:
-			training_data.append(X[index])
-			training_labels.append(X[index])
-		else:
-			testing_data.append(X[index])
-			testing_labels.append(X[index])
-	training_data = np.array(training_data)
-	testing_data = np.array(testing_data)
-	training_labels = np.array(training_labels)
-	testing_labels = np.array(testing_labels)
-	return training_data, training_labels, testing_data, testing_labels
+    # Instructions: split data in training and testing sets.
+    assert len(X) == len(y)
+    assert n < 1
+    assert n > 0
+    training_data = []
+    testing_data = []
+    training_labels = []
+    testing_labels = []
+    for index in range(0, len(X)):
+        # note that the seed can be set with random.seed().
+        # useful for debugging.
+        roll = random.uniform(0, 1)
+        if roll < n:
+            training_data.append(X[index])
+            training_labels.append(y[index])
+        else:
+            testing_data.append(X[index])
+            testing_labels.append(y[index])
+    training_data = np.array(training_data)
+    testing_data = np.array(testing_data)
+    training_labels = np.array(training_labels)
+    testing_labels = np.array(testing_labels)
+    return training_data, training_labels, testing_data, testing_labels
 
-def normalize_data(data):
-	# Instructions: normalize/standardize the data
-
-	# These instructions could mean a few things. I'm just going to take the z-score of each image.
-	standardized = []
-	for image in data:
-		standardized.append(np.subtract(image, np.min(image)) / (np.max(image) - np.min(image)))
-	return np.array(standardized)
+def normalize_data(data): #TODO
+	# normalize/standardize the data
+    res = (data - data.mean()) / (data.std()) 
+    return res
