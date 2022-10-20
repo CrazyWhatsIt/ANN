@@ -5,6 +5,7 @@ import math
 from data import readDataLabels, normalize_data, train_test_split, to_categorical
 from utils import accuracy_score, CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
 
+
 # Create an MLP with 8 neurons
 # Input -> Hidden Layer -> Output Layer -> Output
 # Neuron = f(w.x + b)
@@ -21,9 +22,11 @@ class ANN:
         self.hidden_unit_activation = hidden_unit_activation
         self.output_activation = output_activation
         self.loss_function = loss_function
-
+        self.initialize_weights()
 
     def initialize_weights(self):   # TODO
+        self.input_hidden_w=np.random.normal(loc=0.0,scale=1.0,szie=(self.num_hidden_units,self.num_input_features))
+        self.hidden_output_w=np.random.normal(loc=0.0,scale=1.0,size=(self.num_outputs,self.num_hidden_units))
         # Create and Initialize the weight matrices
         # Never initialize to all zeros. Not Cool!!!
         # Try something like uniform distribution. Do minimal research and use a cool initialization scheme.
@@ -32,6 +35,7 @@ class ANN:
         self.w2 = np.random.uniform(0, 1, size=(self.num_outputs, self.num_hidden_units)) # hidden_w is of shape 10 by 16.
         self.b2 = np.random.uniform(0, 1, size=self.num_outputs) # hidden_b is of shape 1 by 10.
 
+
     def forward(self, input_array):      # TODO
         # x = input matrix
         # hidden activation y = f(z), where z = w.x + b
@@ -39,6 +43,7 @@ class ANN:
         # Trick here is not to think in terms of one neuron at a time
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
+
         self.x = input_array # x is of shape 1 by 64, or N by 64 for a sample of size N.
         self.z = np.dot(self.w1, self.x.T) + self.b1.T
         HUA = self.hidden_unit_activation()
@@ -88,13 +93,15 @@ class ANN:
 #            self.backward(y_gt)
 #            self.update_params()
 
-    def test(self, test_dataset):
+
+    def test(self, test_x,test_labels):
         accuracy = 0    # Test accuracy
+        y_pred=self.forward(test_x)
+        accuracy = accuracy_score(test_labels, y_pred)
         # Get predictions from test dataset
         # Calculate the prediction accuracy, see utils.py
         accuracy = accuracy_score(y_gt, self.y_pred)
         return accuracy
-
 
 #def main(argv):
 #    ann = ANN(num_input_features=64,num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation, output_activation=SoftmaxActivation, loss_function=CrossEntropyLoss)
