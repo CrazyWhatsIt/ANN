@@ -2,8 +2,10 @@ import os, sys
 import numpy as np
 import math
 
-from data import readDataLabels, normalize_data, train_test_split, to_categorical
-from utils import accuracy_score, CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
+#from data import readDataLabels, normalize_data, train_test_split, to_categorical
+#from utils import accuracy_score, CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
+exec(open('./data.py').read())
+exec(open('./utils.py').read())
 
 # Create an MLP with 8 neurons
 # Input -> Hidden Layer -> Output Layer -> Output
@@ -27,10 +29,10 @@ class ANN:
         # Create and Initialize the weight matrices
         # Never initialize to all zeros. Not Cool!!!
         # Try something like uniform distribution. Do minimal research and use a cool initialization scheme.
-        self.w1 = np.random.uniform(0, 1, size=(self.num_hidden_units, self.num_input_features)) # input_w is of shape 16 by 64.
-        self.b1 = np.random.uniform(0, 1, size=self.num_hidden_units) # input_b is of shape 1 by 16.
-        self.w2 = np.random.uniform(0, 1, size=(self.num_outputs, self.num_hidden_units)) # hidden_w is of shape 10 by 16.
-        self.b2 = np.random.uniform(0, 1, size=self.num_outputs) # hidden_b is of shape 1 by 10.
+        self.w1 = np.random.uniform(0, 1, size=(self.num_input_features, self.num_hidden_units)) # w1 is of shape 64 by 16.
+        self.b1 = np.random.uniform(0, 1, size=self.num_hidden_units) # b1 is of shape 1 by 16.
+        self.w2 = np.random.uniform(0, 1, size=(self.num_hidden_units, self.num_outputs)) # hidden_w is of shape 16 by 10.
+        self.b2 = np.random.uniform(0, 1, size=self.num_outputs) # b2 is of shape 1 by 10.
 
     def forward(self, input_array):      # TODO
         # x = input matrix
@@ -40,10 +42,10 @@ class ANN:
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
         self.x = input_array # x is of shape 1 by 64, or N by 64 for a sample of size N.
-        self.z = np.dot(self.w1, self.x.T) + self.b1.T
+        self.z = self.x.dot(self.w1) + self.b1
         HUA = self.hidden_unit_activation()
         self.z1 = HUA(self.z)
-        self.z2 = np.dot(self.w2, self.z1.T) + self.b2.T
+        self.z2 = self.z1.dot(self.w2) + self.b2
         OA = self.output_activation()
         self.y_pred = OA(self.z2)
 
@@ -96,24 +98,80 @@ class ANN:
         return accuracy
 
 
-#def main(argv):
-#    ann = ANN(num_input_features=64,num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation, output_activation=SoftmaxActivation, loss_function=CrossEntropyLoss)
-#    # Load dataset
-#    X,y = readDataLabels()      # dataset[0] = X, dataset[1] = y
-#    # Split data into train and test split. call function in data.py
-#    train_x, train_y, test_x, test_y = train_test_split(X,y)
-#    train_x = normalize_data(train_x)
-#    test_x = normalize_data(test_x)
-#    train_y = to_categorical(train_y)
-#    test_y = to_categorical(test_y)
-#    # call ann->train()... Once trained, try to store the model to avoid re-training everytime
-#    if mode == 'train':
-#        ann.train(x=train_x, y_gt=train_y)        # Call ann training code here
-#    else:
-#        # Call loading of trained model here, if using this mode (Not required, provided for convenience)
-#        raise NotImplementedError
-#    # Call ann->test().. to get accuracy in test set and print it.
-#    ann.test(test_x, test_y)
+def main(argv):
+    ann = ANN(num_input_features=64, num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation, output_activation=SoftmaxActivation, loss_function=CrossEntropyLoss)
+    # Load dataset
+    X,y = readDataLabels()      # dataset[0] = X, dataset[1] = y
+    # Split data into train and test split. call function in data.py
+    train_x, train_y, test_x, test_y = train_test_split(X,y)
+    train_x = normalize_data(train_x)
+    test_x = normalize_data(test_x)
+    train_y = to_categorical(train_y)
+    test_y = to_categorical(test_y)
+    # call ann->train()... Once trained, try to store the model to avoid re-training everytime
+    if mode == 'train':
+        ann.train(x=train_x, y_gt=train_y)        # Call ann training code here
+    else:
+        # Call loading of trained model here, if using this mode (Not required, provided for convenience)
+        raise NotImplementedError
+    # Call ann->test().. to get accuracy in test set and print it.
+    ann.test(test_x, test_y)
+
+if __name__ == "__main__":
+    main(sys.argv)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########### in class begins:
+#X,y = readDataLabels()
 #
-#if __name__ == "__main__":
-#    main(sys.argv)
+## one-hot encoding:
+#y_gt = np.zeros((y.shape[0], np.amax(y))) # dummies - y_gt
+#
+## normalize X
+#X_norm = (X - np.amin(X))/(np.amax(X)-np.amin(X))
+#
+## train test split. The block below does not shuffle the original dataset.
+#ratio = 0.6
+#num_train_samples = int(y.shape[0] * ratio)
+##num_test_samples = int(y.shape[0] * (1-ratio))
+#X_train, y_train = X_norm[:num_train_samples], y_gt[:num_train_samples]
+#X_test, y_test = X_norm[num_train_samples:], y_gt[num_train_samples:]
+#
+## 
+#
+#def sigmoid(x):
+#    y = 1/(1+np.exp(-x))
+#    return y
+#
+#def softmax(x):
+#    
+#    return y
+#
+#def forward(self):
+#    # initialize w1, b1, w2, b2
+#    z1 = X_train.dot(w1) + b1
+#    a1 = sigmoid(z1)
+#
+#
+#
+#
+#
+#
+#
+#
+#
+########### in class ends.

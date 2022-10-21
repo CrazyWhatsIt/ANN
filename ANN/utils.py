@@ -36,15 +36,13 @@ class CrossEntropyLoss:     # TODO: Make this work!!!
         self.current_gt = None
         pass
 
-#y_gt = np.random.randint(2, size=10)
-#y_pred = np.random.uniform(0, 1, size=10)
     def __call__(self, y_pred, y_gt): # y_pred should be an array of probabilities
         # TODO: Calculate Loss Function
         self.current_prediction = y_pred
         self.current_gt = y_gt
         log_prob = np.log(y_pred)
-        loss = -np.sum(y_gt*y_pred)
-        return loss
+        loss = -np.sum(y_gt*log_prob)
+        return loss # sum across both classes and samples
 
     def grad(self):
         # TODO: Calculate Gradients for back propagation
@@ -63,7 +61,7 @@ class SoftmaxActivation:    # TODO: Make this work!!!
     def __call__(self, z):
         # TODO: Calculate Activation Function
         self.z = z
-        y = np.exp(z) / np.sum(np.exp(z))
+        y = np.exp(z) / np.sum(np.exp(z)) # sum across axis=1
         self.y = y
         return y
     def __grad__(self):
