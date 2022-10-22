@@ -17,16 +17,16 @@ class MSELoss:      # For Reference
         loss = 0.5 * np.power((y_gt - y_pred), 2)
         return loss
 
-    def grad(self):
-        # Derived by calculating dL/dy_pred
-        gradient = -1 * (self.current_gt - self.current_prediction)
-
-        # We are creating and emptying buffers to emulate computation graphs in
-        # Modern ML frameworks such as Tensorflow and Pytorch. It is not required.
-        self.current_prediction = None
-        self.current_gt = None
-
-        return gradient
+#    def grad(self):
+#        # Derived by calculating dL/dy_pred
+#        gradient = -1 * (self.current_gt - self.current_prediction)
+#
+#        # We are creating and emptying buffers to emulate computation graphs in
+#        # Modern ML frameworks such as Tensorflow and Pytorch. It is not required.
+#        self.current_prediction = None
+#        self.current_gt = None
+#
+#        return gradient
 
 
 class CrossEntropyLoss:     # TODO: Make this work!!!
@@ -41,17 +41,17 @@ class CrossEntropyLoss:     # TODO: Make this work!!!
         self.current_prediction = y_pred
         self.current_gt = y_gt
         log_prob = np.log(y_pred)
-        loss = -np.sum(y_gt*log_prob)
-        return loss # sum across both classes and samples
+        loss_by_sample = -np.sum(y_gt*log_prob, axis=1)
+        self.loss = np.sum(loss_by_sample, axis=0)
 
-    def grad(self):
-        # TODO: Calculate Gradients for back propagation
-        # Derived by calculating dL/dy_pred
-        gradient = -np.sum(self.current_gt/self.current_prediction)
-
-        self.current_prediction = None
-        self.current_gt = None
-        return gradient
+#    def grad(self):
+#        # TODO: Calculate Gradients for back propagation
+#        # Derived by calculating dL/dy_pred
+#        gradient = self.current_gt/self.current_prediction
+#
+#        self.current_prediction = None
+#        self.current_gt = None
+#        return gradient
 
 
 class SoftmaxActivation:    # TODO: Make this work!!!
@@ -64,10 +64,12 @@ class SoftmaxActivation:    # TODO: Make this work!!!
         y = np.exp(z) / np.sum(np.exp(z)) # sum across axis=1
         self.y = y
         return y
-    def __grad__(self):
-        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        gradient = self.y*(1-self.y)
-        return gradient
+#    def __grad__(self):
+#        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
+#        gradient = self.y*(1-self.y)
+#        return gradient
+
+
 #    def __grad__(self):
 #        jacobian = np.diag(y)
 #        for i in range(len(jacobian)):
@@ -95,10 +97,10 @@ class SigmoidActivation:    # TODO: Make this work!!!
         self.y = y
         return y
 
-    def __grad__(self):
-        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
-        gradient = self.y*(1-self.y)
-        return gradient
+#    def __grad__(self):
+#        # TODO: Calculate Gradients.. Remember this is calculated w.r.t. input to the function -> dy/dz
+#        gradient = self.y*(1-self.y)
+#        return gradient
 
 
 class ReLUActivation:
