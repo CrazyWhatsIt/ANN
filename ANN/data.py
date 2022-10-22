@@ -1,13 +1,26 @@
 import os, sys
 import numpy as np
+import random
 from sklearn import datasets
 import random
 #import libraries as needed
-
 def readDataLabels(): 
-	#read in the data and the labels to feed into the ANN
+	# Instructions: read in the data and the labels to feed into the A
+
+	# Note, there are 64 "fattened" pixels in each image and 1797 images in the dataset.
+	# here, "flattened" just means that pixels are stored in a single dimension of an array,
+	# rather than in two dimensions.
+
+	# Data is a python bunch object. Basically, a dictionary that lets you
+	# use dot notation to dereference attributes. See https://pypi.org/project/bunch/
+	# Here is the list of attributes for data: 'data', 'target', 'frame', 'feature_names',
+	# 'target_names', 'images', 'DESCR'
+
 	data = datasets.load_digits()
+	# X is a 1797 by 64 numpy multidimensional array.
+	# https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html
 	X = data.data
+	# y is a 1797 length numpy multidimensional array.
 	y = data.target
 
 	return X,y

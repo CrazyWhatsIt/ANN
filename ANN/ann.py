@@ -4,6 +4,7 @@ import math
 from data import readDataLabels, normalize_data, train_test_split, to_categorical
 from utils import CrossEntropyLoss, SigmoidActivation, SoftmaxActivation, accuracy_score
 
+
 # Create an MLP with 8 neurons
 # Input -> Hidden Layer -> Output Layer -> Output
 # Neuron = f(w.x + b)
@@ -30,7 +31,7 @@ class ANN:
         self.hidden_unit_activation = hidden_unit_activation
         self.output_activation = output_activation
         self.loss_function = loss_function
-
+        
     def initialize_weights(self):
         # Create and Initialize the weight matrices
         # Never initialize to all zeros. Not Cool!!!
@@ -47,6 +48,7 @@ class ANN:
         # Trick here is not to think in terms of one neuron at a time
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
+
         self.data = input_x  # x is of shape 1 by 64, or N by 64 for a sample of size N.
         self.y_gt = to_categorical(input_y)
         self.z = self.data.dot(self.weight1) + self.bias1
@@ -100,7 +102,6 @@ class ANN:
         # Calculate the prediction accuracy, see utils.py
         accuracy = accuracy_score(y, np.argmax(self.y_pred, axis=1))
         return accuracy
-
 
 def main(argv):
     ann = ANN(num_input_features=64, num_hidden_units=16, num_outputs=10, hidden_unit_activation=SigmoidActivation(),
