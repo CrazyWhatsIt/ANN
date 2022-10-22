@@ -43,6 +43,7 @@ class CrossEntropyLoss:     # TODO: Make this work!!!
         log_prob = np.log(y_pred)
         loss_by_sample = -np.sum(y_gt*log_prob, axis=1)
         self.loss = np.sum(loss_by_sample, axis=0)
+        return self.loss
 
 #    def grad(self):
 #        # TODO: Calculate Gradients for back propagation
