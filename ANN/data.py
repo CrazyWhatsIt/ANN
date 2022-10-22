@@ -2,7 +2,7 @@ import os, sys
 import numpy as np
 import random
 from sklearn import datasets
-
+import random
 #import libraries as needed
 def readDataLabels(): 
 	# Instructions: read in the data and the labels to feed into the A
@@ -62,5 +62,5 @@ def train_test_split(X,y,n=0.8):
 
 def normalize_data(data): #TODO
 	# normalize/standardize the data
-    res = (data - data.mean()) / (data.std()) 
-    return res
+    data_norm = (data - np.amin(data))/(np.amax(data)-np.amin(data))
+    return data_norm
