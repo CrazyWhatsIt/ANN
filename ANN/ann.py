@@ -49,42 +49,42 @@ class ANN:
         # Rather think in terms of matrices where each 'element' represents a neuron
         # and a layer operation is carried out as a matrix operation corresponding to all neurons of the layer
 
-        self.data = input_x  # x is of shape 1 by 64, or N by 64 for a sample of size N.
+        self.data = input_x  # x is of size N by 64 for a sample of size N.
         self.y_gt = to_categorical(input_y)
-        self.z = self.data.dot(self.weight1) + self.bias1
-        self.z1 = self.hidden_unit_activation(self.z)
-        self.z2 = self.z1.dot(self.weight2) + self.bias2
-        self.y_pred = self.output_activation(self.z2)
+        self.z = self.data.dot(self.weight1) + self.bias1 # z is of size N by 16.
+        self.z1 = self.hidden_unit_activation(self.z) # z1 is of size N by 16.
+        self.z2 = self.z1.dot(self.weight2) + self.bias2 # z2 is of size N by 10.
+        self.y_pred = self.output_activation(self.z2) # y_pred is of size N by 10.
 
-#    def backward(self, y_gt):     # TODO
-#        dL_dy_pred = self.CEL.grad()
-#
-#        SMA = SoftmaxActivation()
-#        SMA(self.z2)
-#        dy_pred_dz2 = SMA.__grad__()
-#
-#        dz2_dz1 = self.w2
-#        dz2_dw2 = self.z1
-#
-#        SigA = SigmoidActivation()
-#        SigA(self.z)
-#        dz1_dz = SigA.__grad__()
-#        dz_dw1 = self.x
-#        self.dL_dw2 = dL_dy_pred * dy_pred_dz2 * dz2_dw2
+    def backward(self, y_gt):     # TODO
+        self.loss_function(self.y_pred, self.y_gt)
+        dL_dy_pred = self.loss_function.grad() # size N by 10.
+
+        self.output_activation(self.z2)
+        dy_pred_dz2 = self.output_activation.__grad__() # size N by 10.
+
+        dz2_dz1 = self.weight2 # size 16 by 10.
+        dz2_dw2 = self.z1 # size N by 16.
+
+        self.hidden_unit_activation(self.z)
+        dz1_dz = self.hidden_unit_activation.__grad__() # size is N by 16.
+        dz_dw1 = self.data  
+        self.dL_dw2 = dL_dy_pred.dot(dy_pred_dz2.T).dot(dz2_dw2)
+#        self.dL_dw1 = dL_dy_pred.dot(dy_pred_dz2.T).dot(dz2_dz1)
 #        self.dL_dw1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_dw1
-#
-#        dz2_db2 = 1
-#        self.dL_db2 = dL_dy_pred * dy_pred_dz2 * dz2_db2
-#        dz_db1 = 1
-#        self.dL_db1 = dL_dy_pred * dy_pred_dz2 * dz2_dz1 * dz1_dz * dz_db1
-#
-#
-#    def update_params(self, learning_rate=0.01):    # TODO
-#        # Take the optimization step.
-#        self.w1 = self.w1 - learning_rate*self.dL_dw1
-#        self.w2 = self.w2 - learning_rate*self.dL_dw2
-#        self.b1 = self.b1 - learning_rate*self.dL_db1
-#        self.b2 = self.b2 - learning_rate*self.dL_db2
+
+        dz2_db2 = 1
+#        self.dL_db2 = dL_dy_pred.dot(dy_pred_dz2) * dz2_db2
+        dz_db1 = 1
+#        self.dL_db1 = (dL_dy_pred.dot(dy_pred_dz2.T) * dz2_dz1).dot(dz1_dz) * dz_db1
+
+
+    def update_params(self, learning_rate=0.01):    # TODO
+        # Take the optimization step.
+        self.weight1 = self.weight1 - learning_rate*self.dL_dw1
+        self.weight2 = self.weight2 - learning_rate*self.dL_dw2
+        self.bias1 = self.bias1 - learning_rate*self.dL_db1
+        self.bias2 = self.bias2 - learning_rate*self.dL_db2
 
     def train(self, x, y, learning_rate=0.01, num_epochs=1, noisily=True):
         self.initialize_weights()
@@ -93,8 +93,8 @@ class ANN:
             self.forward(x, y) # self.forward records all intermediate variables in forward propagation.
             if noisily: print('Training loss is ', self.loss_function(self.y_pred, self.y_gt))
             if noisily: print('Training accuracy is ', accuracy_score(y, np.argmax(self.y_pred, axis=1)))
-#            self.backward(y_gt)
-#            self.update_params()
+            self.backward(y_gt)
+            self.update_params()
 
     def test(self, x, y):
         # Get predictions from test dataset
