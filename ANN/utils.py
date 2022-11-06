@@ -29,26 +29,48 @@ class MSELoss:      # For Reference
         return gradient
 
 
+# This block that is commented out was meant to be a multi-class cross-entropy loss function implementation.
+# We did not manage to get it to work in backpropagation.
+#class CrossEntropyLoss:     # TODO: Make this work!!!
+#    def __init__(self):
+#        # Buffers to store intermediate results.
+#        self.current_prediction = None
+#        self.current_gt = None
+#        pass
+#    def __call__(self, y_pred, y_gt): # y_pred should be an array of probabilities
+#        # TODO: Calculate Loss Function
+#        y_pred = np.clip(y_pred, 1e-15, 1-1e-15)
+#        self.current_prediction = y_pred
+#        self.current_gt = y_gt
+#        log_prob = np.log(y_pred)
+#        loss_by_sample = -np.sum(y_gt*log_prob, axis=1)
+#        loss = np.sum(loss_by_sample, axis=0)
+#        return loss
+#    def grad(self):
+#        # TODO: Calculate Gradients for back propagation
+#        # Derived by calculating dL/dy_pred
+#        gradient = -self.current_gt/self.current_prediction
+#        self.current_prediction = None
+#        self.current_gt = None
+#        return gradient
+
+
 class CrossEntropyLoss:     # TODO: Make this work!!!
     def __init__(self):
         # Buffers to store intermediate results.
         self.current_prediction = None
         self.current_gt = None
         pass
-    def __call__(self, y_pred, y_gt): # y_pred should be an array of probabilities
+    def __call__(self, y_pred, y_gt):
         # TODO: Calculate Loss Function
-        self.current_prediction = y_pred
-        self.current_gt = y_gt
-        log_prob = np.log(y_pred)
-        loss_by_sample = -np.sum(y_gt*log_prob, axis=1)
-        loss = np.sum(loss_by_sample, axis=0)
+        self.y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)
+        self.y_gt = y_gt
+        loss = - y_gt * np.log(y_pred) - (1 - y_gt) * np.log(1 - y_pred)
         return loss
     def grad(self):
         # TODO: Calculate Gradients for back propagation
-        # Derived by calculating dL/dy_pred
-        gradient = self.current_gt/self.current_prediction
-        self.current_prediction = None
-        self.current_gt = None
+        self.y_pred = np.clip(self.y_pred, 1e-15, 1 - 1e-15)
+        gradient = - (self.y_gt / self.y_pred) + (1 - self.y_gt) / (1 - self.y_pred)
         return gradient
 
 
@@ -59,7 +81,7 @@ class SoftmaxActivation:    # TODO: Make this work!!!
     def __call__(self, z):
         # TODO: Calculate Activation Function
         self.z = z
-        y = np.exp(z) / np.sum(np.exp(z), axis=1)[:, None] # sum across axis=1
+        y = np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True) # sum across axis=1
         self.y = y
         return y
     def __grad__(self):
@@ -101,7 +123,8 @@ class ReLUActivation:
         return gradient
 
 
-def accuracy_score(y_true, y_pred):
-    """ Compare y_true to y_pred and return the accuracy """
-    accuracy = np.sum(y_true == y_pred, axis=0) / len(y_true)
+def accuracy_score(y_pred, y_gt):
+    y_pred = np.argmax(y_pred, axis=1)
+    y_gt = np.argmax(y_gt, axis=1)
+    accuracy = np.sum(y_pred == y_gt)/y_gt.shape[0]
     return accuracy

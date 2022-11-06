@@ -62,5 +62,6 @@ def train_test_split(X,y,n=0.8):
 
 def normalize_data(data): #TODO
 	# normalize/standardize the data
-    data_norm = (data - np.amin(data))/(np.amax(data)-np.amin(data))
-    return data_norm
+	l2 = np.atleast_1d(np.linalg.norm(data, ord=2, axis=1))
+	l2[l2 == 0] = 1
+	return data / np.expand_dims(l2, axis=1)
