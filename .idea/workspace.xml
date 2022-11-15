@@ -2,14 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="207c621c-6061-4e53-9afc-70b496af7a30" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ANN/ann.py" beforeDir="false" afterPath="$PROJECT_DIR$/ANN/ann.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ANN/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/ANN/data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ANN/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ANN/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DBSCAN/data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DBSCAN/dbscan.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DBSCAN/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
