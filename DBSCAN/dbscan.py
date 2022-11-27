@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 from data import readDataLabels
-from utils import plot
+from utils import plot, euclidean_distance
 
 from sklearn.cluster import DBSCAN as sklearnDBSCAN     # Only jerks will use this in assignment!
 
@@ -17,10 +17,9 @@ def test_sklearn(X):
 class DBSCAN():
 
     """
-
-        eps  - The radius within which samples are considered neighbors.
-        min_samples - The minimum number of samples required by a point to
-                        be considered core point.
+    eps  - The radius within which samples are considered neighbors.
+    min_samples - The minimum number of samples required by a point to
+                    be considered core point.
     """
     def __init__(self, eps=1.0, min_samples=5):
         self.eps = eps
@@ -34,9 +33,11 @@ class DBSCAN():
         neighbors = []
         idxs = np.arange(len(self.X))
         for i, _sample in enumerate(self.X[idxs != sample_i]):
-            # TODO
-            pass
+            dist = euclidean_distance(self.X[sample_i], _sample)
+            if dist <= self.eps:
+                neighbors.append(i)
         return np.asarray(neighbors)
+
 
 
     def expand_cluster(self, sample_i, neighbors): #TODO
@@ -53,7 +54,10 @@ class DBSCAN():
                 # Make sure the neighbor's neighbors are more than min_samples
                 # (If this is true the neighbor is a core point) -> call this function to expand the cluster.
                 # Else, the neighbor is not a core point so just add it to the cluster
-
+                self.neighbors[neighbor_i] = self.get_neighbors(neighbor_i) # neighbors of neighbor
+                if len(self.neighbors[neighbor_i]) >= self.min_samples:
+                    new = self.expand_cluster(neighbor_i, self.neighbors[neighbor_i])
+                    cluster = cluster + new
         return cluster
 
 
@@ -63,7 +67,10 @@ class DBSCAN():
         # This will make sure all outliers have same cluster label
         labels = np.full(shape=self.X.shape[0], fill_value=len(self.clusters))
         # Finish this
-
+        counter = 0
+        for cluster in self.clusters:
+            labels[cluster] = counter
+            counter += 1
         return labels
 
 
@@ -93,19 +100,17 @@ class DBSCAN():
                 new_cluster = self.expand_cluster(sample, self.neighbors[sample])
                 # Add cluster to list of clusters
                 self.clusters.append(new_cluster)
-            pass
-
 
         cluster_labels = self.det_cluster_labels()
         return cluster_labels
 
 
+
 def main():
 
-    dbscan = DBSCAN() #add custom parameters for eps and min_samples
+#####    dbscan = DBSCAN() #add custom parameters for eps and min_samples
 
     X,y = readDataLabels()
-    plot(X, y)
 
     # Run prediction over the data
     # Cluster the data using DBSCAN
@@ -113,6 +118,8 @@ def main():
     y_pred = clf.predict(X)
 
     # Plot and compare to ground truth
+    plot(X, y_pred) # prediction performance
+    plot(X, y) # ground truth
 
     # For reference... This is how sklearn performs!
     test_sklearn(X)
@@ -120,5 +127,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

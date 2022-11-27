@@ -12,4 +12,4 @@ def plot(X, y):
 def euclidean_distance(x1,x2):
     #TODO
     #calculates l2 distance between two vectors
-    return
+    return np.sqrt(np.sum((x1 - x2)**2))
